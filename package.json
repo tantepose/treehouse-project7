@@ -1,0 +1,23 @@
+{
+  "name": "project7-api-with-node-v1",
+  "version": "1.0.0",
+  "description": "Build a Twitter Interface, using Node and Express.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tantepose/treehouse-project7.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tantepose/treehouse-project7/issues"
+  },
+  "homepage": "https://github.com/tantepose/treehouse-project7#readme",
+  "dependencies": {
+    "express": "^4.16.2"
+  }
+}
