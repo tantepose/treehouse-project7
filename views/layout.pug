@@ -5,10 +5,24 @@ html(lang="en")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         meta(http-equiv="X-UA-Compatible", content="ie=edge")
         title Twitter Client
+        link(href='https://fonts.googleapis.com/css?family=Work+Sans:400,600', rel='stylesheet', type='text/css')
         link(rel='stylesheet', href='/static/css/global.css')
     body
         include header.pug
-        include timeline.pug
-        include following.pug
-        include messages.pug
         include tweet.pug
+        .bounds.app--body
+            .app--section--header
+                .grid-33
+                    .app--section--heading
+                        h2 Timeline
+                .grid-33
+                    .app--section--heading
+                        strong 129
+                        h2 Following
+                .grid-33
+                    .app--section--heading
+                        h2 Direct Messages
+            include timeline.pug
+            include following.pug
+            include messages.pug
+        
