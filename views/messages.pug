@@ -9,4 +9,4 @@
             ul.app--message
               .app--avatar(style='background-image: url(' + message.sender.profile_image_url + ')')
               p.app--message--text #{message.text}
-              p.app--message--timestamp X hours ago, from #{message.sender.name}
+              p.app--message--timestamp #{message.created_at}, from #{message.sender.name}

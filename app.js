@@ -11,8 +11,8 @@ let's you tweet.
 *****************************************/
 
 /*****************************************
-SETUP
-getting all we need set up
+    SETUP
+        getting all we need set up
 *****************************************/
 
 //set up express
@@ -41,8 +41,8 @@ var twitterContainer = {};
 var moment = require('moment');
 
 /*****************************************
-MIDDLEWARE
-filling our Twitter-object with data from the API
+    MIDDLEWARE
+        getting the data from the API
 *****************************************/
 
 //get messages
@@ -50,6 +50,12 @@ app.use((req, res, next) => {
     T.get('direct_messages', { 'count': 5 }, (err, data, response) => {        
         if (!err) {
             twitterContainer.messages = data;
+
+            //change timestamp of each tweet, using moment
+            twitterContainer.messages.forEach(message => {
+                message.created_at = moment(message.created_at).fromNow();
+            });
+            
             next();
         } else {
             console.log('Messages failed: ' + err.message);
@@ -91,8 +97,17 @@ app.use((req, res, next) => {
     });
 });
 
-//ROUTES
-//rendering root, posting tweets
+//get profile, with number of followers
+app.use((req, res, next) => {
+    T.get('account/verify_credentials', (err, data, response) => {        
+        twitterContainer.profile = data;
+    });
+});
+
+/*****************************************
+    ROUTES
+        rendering root, posting tweets
+*****************************************/
 
 //get request at root
 app.get('/', (req, res) => {
@@ -101,7 +116,8 @@ app.get('/', (req, res) => {
     res.render('index', {
         tweets: twitterContainer.tweets,
         friends: twitterContainer.friends,
-        messages: twitterContainer.messages
+        messages: twitterContainer.messages,
+        profile: twitterContainer.profile
     });
 });
 
@@ -143,9 +159,10 @@ app.get('/json/account', (req, res) => {
     });
 });
 
-//////////////////
-//ERROR HANDLING//
-//////////////////
+/*****************************************
+    ERROR HANDLING
+        making 404 error & handling errors
+*****************************************/
 
 //404 error
 app.use((req, res, next) => {
@@ -158,9 +175,10 @@ app.use((err, req, res, next) => {
     res.render('error', { error : err }); 
 });
 
-////////////////
-//SERVER SETUP//
-////////////////
+/*****************************************
+    SERVER SETUP
+        listen for incoming traffic
+*****************************************/
 
 //listen for incoming traffic at port 3000, or env.PORT if deployed
 app.listen(process.env.PORT || 3000, () => {
@@ -169,11 +187,10 @@ app.listen(process.env.PORT || 3000, () => {
 
 /* 
 TODO:
-* ordne tidsgreia på tweets
-* se over hva slags annen dummydata som ligger der
+X ordne tidsgreia på tweets
+X se over hva slags annen dummydata som ligger der
 X fikse layouten
 * sjekke om jeg bruker puggene riktig
+* lage egen funksjon for å regne ut timestamps
 
-moment
-http://momentjs.com
 */
