@@ -11,6 +11,4 @@ From the instructions:
 > * Your 5 most recent friends.
 > * Your 5 most recent private messages.
 
----
-
 www.olepetterstokke.no/treehouse/project7
