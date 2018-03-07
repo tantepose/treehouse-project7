@@ -200,6 +200,7 @@ TODO:
 X ordne tidsgreia på tweets
 X se over hva slags annen dummydata som ligger der
 X fikse layouten
+X legg til followers og screenname fra account
 * sjekke om jeg bruker puggene riktig
 * lage egen funksjon for å regne ut timestamps
 
