@@ -97,12 +97,22 @@ app.use((req, res, next) => {
     });
 });
 
-//get profile, with number of followers
+//get user account
 app.use((req, res, next) => {
-    T.get('account/verify_credentials', (err, data, response) => {        
-        twitterContainer.profile = data;
+    T.get('account/verify_credentials', (err, data, response) => {
+        if (!err) {
+            twitterContainer.account = data;
+            next();
+        } else {
+            console.log('Account failed: ' + err.message);
+            next(err);
+        }
+        
     });
 });
+
+//account.screen_name
+//account.followers_count
 
 /*****************************************
     ROUTES
@@ -117,7 +127,7 @@ app.get('/', (req, res) => {
         tweets: twitterContainer.tweets,
         friends: twitterContainer.friends,
         messages: twitterContainer.messages,
-        profile: twitterContainer.profile
+        account: twitterContainer.account
     });
 });
 
