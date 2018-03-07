@@ -1,25 +1,21 @@
 /*****************************************
 Treehouse Fullstack Javascript Techdegree,
 project #7: "Build a Twitter Interface"
+- Express app using Twitter’s REST API
 by Ole Petter Baugerød Stokke
 www.olepetterstokke.no/treehouse/project7
 ******************************************
-Express app using the Twitter’s REST API
-to display the 5 last tweets, followers, 
-and incoming messages from Twitter. Also 
-let's you tweet. 
-*****************************************/
-
+    
 /*****************************************
     SETUP
-        getting all we need set up
+    getting all we need set up
 *****************************************/
 
 //set up express
 const express = require('express');
 const app = express(); 
 
-//set up Twit (using config.js for credencials)
+//set up Twit (using ./config.js for credencials)
 const Twit = require('twit');
 const twitConfig = require('./config.js');
 const T = new Twit(twitConfig.config);
@@ -27,44 +23,44 @@ const T = new Twit(twitConfig.config);
 //set up static data (css, images)
 app.use('/static', express.static('public'));
 
-//set up the pug view engine (using default \views-path)
+//set up the pug view engine (using default /views path)
 app.set('view engine', 'pug');
 
 //set up bodyparser (to get text from form)
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: false}));
 
-//set up empty object to contain all info needed from Twitter
+//set up empty object to contain all data from Twitter
 var twitterContainer = {};
 
-//set up moment for timestamps
+//set up momentJS for timestamps
 var moment = require('moment');
 
 /*****************************************
     MIDDLEWARE
-        getting the data from the API
+    collecting data from the API
 *****************************************/
 
-//get messages
+//get timeline
 app.use((req, res, next) => {
-    T.get('direct_messages', { 'count': 5 }, (err, data, response) => {        
+    T.get('statuses/user_timeline', { 'count': 5 }, (err, data, response) => {
         if (!err) {
-            twitterContainer.messages = data;
+            twitterContainer.tweets = data; //add "tweets" property, populate with "data"
 
-            //change timestamp of each tweet, using moment
-            twitterContainer.messages.forEach(message => {
-                message.created_at = moment(message.created_at).fromNow();
+            twitterContainer.tweets.forEach(tweet => { //modify timestamp of each tweet, using moment
+                tweet.created_at = moment(tweet.created_at).fromNow();
             });
-            
+
             next();
-        } else {
-            console.log('Messages failed: ' + err.message);
-            next(err);
+            
+        } else { //if the request fails
+            console.log('Timeline failed: ' + err.message);
+            next(err); //engage error handler with current error
         }
     });
 });
 
-//get friends
+//get followers ("friends")
 app.use((req, res, next) => {
     T.get('friends/list', { 'count': 5 }, (err, data, response) => {
         if (!err) {
@@ -77,21 +73,19 @@ app.use((req, res, next) => {
     });
 });
 
-//get timeline
+//get messages
 app.use((req, res, next) => {
-    T.get('statuses/user_timeline', { 'count': 5 }, (err, data, response) => {
+    T.get('direct_messages', { 'count': 5 }, (err, data, response) => {        
         if (!err) {
-            twitterContainer.tweets = data;
+            twitterContainer.messages = data;
 
-            //change timestamp of each tweet, using moment
-            twitterContainer.tweets.forEach(tweet => {
-                tweet.created_at = moment(tweet.created_at).fromNow();
+            twitterContainer.messages.forEach(message => {
+                message.created_at = moment(message.created_at).fromNow();
             });
 
             next();
-            
         } else {
-            console.log('Timeline failed: ' + err.message);
+            console.log('Messages failed: ' + err.message);
             next(err);
         }
     });
@@ -107,23 +101,17 @@ app.use((req, res, next) => {
             console.log('Account failed: ' + err.message);
             next(err);
         }
-        
     });
 });
 
-//account.screen_name
-//account.followers_count
-
 /*****************************************
     ROUTES
-        rendering root, posting tweets
+    rendering root & posting tweets
 *****************************************/
 
 //get request at root
 app.get('/', (req, res) => {
-
-    //render index with Twitter-data from twitterContainer
-    res.render('index', {
+    res.render('index', { //render index.pug with all Twitter data
         tweets: twitterContainer.tweets,
         friends: twitterContainer.friends,
         messages: twitterContainer.messages,
@@ -131,77 +119,42 @@ app.get('/', (req, res) => {
     });
 });
 
-//post request at root - triggered from form, to post a tweet
+//post request at root (triggered by form submit)
 app.post('/', (req, res) => {
+    const tweet = req.body.tweet; //get tweet from the textarea "tweet"
 
-    //tweet text from the tweet-textbox using bodyparser
-    const tweet = req.body.tweet;
-
-    T.post('statuses/update', {
-        status: tweet
-    });
-
-    res.redirect('/'); //render site again to show new tweet
-});
-
-//routes for debug purposes
-app.get('/json/timeline', (req, res) => {
-    T.get('statuses/user_timeline', { 'count': 5 }, (err, data, response) => {        
-        res.send(data);
-    });
-});
-
-app.get('/json/messages', (req, res) => {
-    T.get('direct_messages', { 'count': 5 }, (err, data, response) => {        
-        res.send(data);
-    });
-});
-
-app.get('/json/friends', (req, res) => {
-    T.get('friends/list', { 'count': 5 }, (err, data, response) => {        
-        res.send(data);
-    });
-});
-
-app.get('/json/account', (req, res) => {
-    T.get('account/verify_credentials', (err, data, response) => {        
-        res.send(data);
+    T.post('statuses/update', {status: tweet}, (err, data, response) => { //post the tweet
+        if (!err) {
+            res.redirect('/'); //show new tweet by re-rendering root
+        } else {
+            console.log('Tweeting failed: ' + err.message);
+            next(err);
+        }            
     });
 });
 
 /*****************************************
     ERROR HANDLING
-        making 404 error & handling errors
+    making a 404 error & handling errors
 *****************************************/
 
-//404 error
+//404 error at unkown routes
 app.use((req, res, next) => {
-    const err = new Error ('404: Page not found.');
-    next(err);
+    const err = new Error ('Page not found.'); //generate the error
+    next(err); //pass error to error handler
 });
 
-//render error page
-app.use((err, req, res, next) => {
-    res.render('error', { error : err }); 
+//our error handler middleware
+app.use((err, req, res, next) => { //called by doing a next(err)
+    res.render('error', { error : err }); //render error.pug with current "err" object
 });
 
 /*****************************************
     SERVER SETUP
-        listen for incoming traffic
+    listen for incoming traffic
 *****************************************/
 
-//listen for incoming traffic at port 3000, or env.PORT if deployed
+//listen at port 3000, or env.PORT if app is deployed
 app.listen(process.env.PORT || 3000, () => {
     console.log('Twitter Client is listening...');
 });
-
-/* 
-TODO:
-X ordne tidsgreia på tweets
-X se over hva slags annen dummydata som ligger der
-X fikse layouten
-X legg til followers og screenname fra account
-* sjekke om jeg bruker puggene riktig
-* lage egen funksjon for å regne ut timestamps
-
-*/

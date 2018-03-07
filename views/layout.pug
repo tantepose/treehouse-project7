@@ -8,21 +8,4 @@ html(lang="en")
         link(href='https://fonts.googleapis.com/css?family=Work+Sans:400,600', rel='stylesheet', type='text/css')
         link(rel='stylesheet', href='/static/css/global.css')
     body
-        include header.pug
-        include tweet.pug
-        .bounds.app--body
-            .app--section--header
-                .grid-33
-                    .app--section--heading
-                        h2 Timeline
-                .grid-33
-                    .app--section--heading
-                        strong #{account.followers_count}
-                        h2 Following
-                .grid-33
-                    .app--section--heading
-                        h2 Direct Messages
-            include timeline.pug
-            include following.pug
-            include messages.pug
-        
+        block content

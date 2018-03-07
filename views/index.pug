@@ -1,1 +1,10 @@
 extends layout.pug
+
+block content
+    include header.pug
+    include tweet.pug
+    .bounds.app--body
+        include section-header.pug
+        include timeline.pug
+        include following.pug
+        include messages.pug
