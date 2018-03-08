@@ -18,7 +18,7 @@ const app = express();
 //set up Twit (using ./config.js for credencials)
 const Twit = require('twit');
 const twitConfig = require('./config.js');
-const T = new Twit(twitConfig.config);
+const T = new Twit(twitConfig);
 
 //set up static data (css, images)
 app.use('/static', express.static('public'));

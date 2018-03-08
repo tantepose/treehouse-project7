@@ -11,10 +11,10 @@ From the instructions:
 > * Your 5 most recent friends.
 > * Your 5 most recent private messages.
 
-Requires a config.js in root, with a set of keys and access tokens from a Twitter app:
+Requires a config.js in root, with a set of keys and access tokens from your Twitter app, as "config.example.js" will show you:
 
 ```javascript
-module.exports.config = {
+module.exports = {
         consumer_key: 'xxx',
         consumer_secret: 'xxx',
         access_token: 'xxx',
